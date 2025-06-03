@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 
 # Set the paths to your dataset
-data_dir = 'C:\Users\QCST\Desktop\Brain Cancer\dataset\Training'  # Replace with your dataset path
+data_dir = r'C:\Users\QCST\Desktop\Brain Cancer\dataset\Training'  # Replace with your dataset path
 categories = ['Tumor', 'No_Tumor']  # Ensure these folder names match your dataset
 
 # Load the images and labels
