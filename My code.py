@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 import seaborn as sns
 
 # Set the paths to your dataset
-data_dir = r'C:\Users\QCST\Desktop\Brain Cancer\dataset\Training'  # Replace with your dataset path
+data_dir = r'C:\Users\Asus\Desktop\Brain-Cancer\Training'  # Replace with your dataset path
 categories = ['Tumor', 'No_Tumor']  # Ensure these folder names match your dataset
 
 # Load the images and labels
@@ -56,10 +56,13 @@ datagen = ImageDataGenerator(
 def create_model(input_shape):
     model = tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        tf.keras.layers.BatchNormalization(),
         tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(128, activation='relu'),
@@ -74,21 +77,25 @@ def create_model(input_shape):
 input_shape = (128, 128, 3)
 model = create_model(input_shape)
 
-# Train the model using the augmented images
-model.fit(datagen.flow(X_train, y_train, batch_size=32), epochs=20, validation_data=(X_test, y_test))
+# Train the model using the augmented images and save training history
+history = model.fit(datagen.flow(X_train, y_train, batch_size=32), epochs=10, validation_data=(X_test, y_test))
+
 
 # Evaluate the model
 y_pred = model.predict(X_test)
 y_pred_classes = (y_pred > 0.5).astype("int32")  # Convert probabilities to class labels
-
 # Generate classification report and confusion matrix
 print(classification_report(y_test, y_pred_classes))
 confusion_mtx = confusion_matrix(y_test, y_pred_classes)
-
-# Visualize confusion matrix
-plt.figure(figsize=(8, 6))
-sns.heatmap(confusion_mtx, annot=True, fmt='d', cmap='Blues', xticklabels=categories, yticklabels=categories)
-plt.ylabel('Actual')
-plt.xlabel('Predicted')
-plt.title('Confusion Matrix')
+# Plot accuracy vs epochs
+plt.figure(figsize=(8,5))
+plt.plot(history.history['accuracy'], label='Training Accuracy', marker='o')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy', marker='x')
+plt.title('Accuracy vs Epoch')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.grid(True)
+plt.savefig('accuracy_vs_epoch.png')  # Save the plot as a file
 plt.show()
+
